@@ -29,11 +29,11 @@ const ProductDetail = () => {
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
-      <Link to="/" className="text-blue-600 underline mb-4 inline-block">
+      <Link to="/" className="text-[#006A71] underline mb-4 inline-block">
         ← Back to Home
       </Link>
 
-      <div className="border p-4 rounded shadow">
+      <div className="p-10 border border-[#006A71] rounded-xl shadow bg-[#C7D9DD]">
         <img
           src={product.image_front_url || "https://via.placeholder.com/300"}
           alt={product.product_name}

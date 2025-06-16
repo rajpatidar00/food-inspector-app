@@ -8,6 +8,7 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
 
   const fetchProducts = async (isSearch = false) => {
     setLoading(true);
@@ -25,6 +26,15 @@ const Home = () => {
       const res = await fetch(url);
       const data = await res.json();
       const newProducts = data.products || [];
+      if (sortOrder === "asc") {
+        newProducts.sort((a, b) =>
+          (a.product_name || "").localeCompare(b.product_name || "")
+        );
+      } else if (sortOrder === "desc") {
+        newProducts.sort((a, b) =>
+          (b.product_name || "").localeCompare(a.product_name || "")
+        );
+      }
 
       setProducts((prev) =>
         isSearch || page === 1 || selectedCategory
@@ -51,7 +61,6 @@ const Home = () => {
         console.error("Error fetching categories:", err);
       }
     };
-
     fetchCategories();
   }, []);
 
@@ -67,27 +76,27 @@ const Home = () => {
   };
 
   return (
-    <div className="p-4 min-h-screen mx-auto bg-white">
-      <h1 className="text-3xl font-bold mb-4">Food Product Explorer</h1>
+    <div className="p-4 text-[#09122C] min-h-screen mx-auto bg-[#9ACBD0]">
+      <div className="flex items-center justify-center py-5">
+        <h1 className="text-4xl  font-bold mb-4">Food Product Explorer</h1>
+      </div>
 
-      <form onSubmit={handleSearch} className="mb-4 flex gap-2">
+      <form onSubmit={handleSearch} className="mb-10 mt-5 flex gap-2">
         <input
           type="text"
           placeholder="Search for products..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border p-2 flex-1 rounded"
+          className="border p-2  flex-1 rounded"
         />
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="bg-[#006A71] text-white px-4 py-2 rounded"
         >
           Search
         </button>
       </form>
-
-      <div className="mb-4">
-        <label className="font-medium mr-2">Filter by Category:</label>
+      <div className="mb-10 mt-10 flex gap-2">
         <select
           value={selectedCategory}
           onChange={(e) => {
@@ -97,22 +106,34 @@ const Home = () => {
           }}
           className="border px-2 py-1 rounded"
         >
-          <option value="">-- All Categories --</option>
+          <option value="">All Categories</option>
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>
               {cat.name}
             </option>
           ))}
         </select>
+        <select
+          value={sortOrder}
+          onChange={(e) => {
+            setSortOrder(e.target.value);
+            setPage(1);
+          }}
+          className="border px-2 py-1 rounded"
+        >
+          <option value="">Default</option>
+          <option value="asc">Name A-Z</option>
+          <option value="desc">Name Z-A</option>
+        </select>
       </div>
 
       {loading && page === 1 ? (
         <p>Wait a mintue...</p>
       ) : (
-        <div className="grid md:grid-cols-4 gap-4">
+        <div className="grid md:grid-cols-5 gap-5">
           {products.map((product) => (
             <Link to={`/product/${product.code}`} key={product.code}>
-              <div className="border rounded p-4 shadow hover:shadow-lg transition cursor-pointer">
+              <div className=" bg-[#C7D9DD] max-w-96 min-h-96 rounded p-4 shadow hover:shadow-lg transition cursor">
                 <img
                   src={
                     product.image_front_small_url ||
@@ -131,6 +152,11 @@ const Home = () => {
                 <p className="text-sm text-gray-600">
                   Nutrition Grade: {product.nutrition_grades || "N/A"}
                 </p>
+                <div className="flex items-center justify-center mt-10">
+                  <button className="bg-[#006A71] min-w-full text-white px-4 py-2 rounded cursor-pointer">
+                    See Product
+                  </button>
+                </div>
               </div>
             </Link>
           ))}
@@ -140,7 +166,7 @@ const Home = () => {
       <div className="mt-6 text-center">
         <button
           onClick={() => setPage((prev) => prev + 1)}
-          className="bg-green-600 text-white px-6 py-2 rounded"
+          className="bg-[#006A71] text-white px-6 py-2 rounded"
         >
           {loading && page > 1 ? "Loading..." : "Load More"}
         </button>
